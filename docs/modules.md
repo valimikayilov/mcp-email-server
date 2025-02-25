@@ -1,1 +1,1 @@
-::: mcp_email_server.foo
+::: mcp_email_server.app
