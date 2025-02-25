@@ -45,12 +45,17 @@ def create_ui():  # noqa: C901
                 accounts_md = "\n".join(accounts_details)
                 return (
                     f"## Configured Accounts\n{accounts_md}",
-                    email_accounts,
+                    gr.update(choices=email_accounts, value=None),
                     gr.update(visible=True),
                     gr.update(visible=True),
                 )
             else:
-                return ("No email accounts configured yet.", [], gr.update(visible=False), gr.update(visible=False))
+                return (
+                    "No email accounts configured yet.",
+                    gr.update(choices=[], value=None),
+                    gr.update(visible=False),
+                    gr.update(visible=False),
+                )
 
         # Display current email accounts and allow deletion
         with gr.Accordion("Current Email Accounts", open=True):
@@ -97,7 +102,7 @@ def create_ui():  # noqa: C901
             app.load(
                 fn=update_account_list,
                 inputs=None,
-                outputs=[accounts_display, account_to_delete, account_to_delete, delete_btn],
+                outputs=[accounts_display, account_to_delete, delete_btn, delete_btn],
             )
 
         # Form for adding a new email account
@@ -335,7 +340,7 @@ def create_ui():  # noqa: C901
                     status_message,
                     accounts_display,
                     account_to_delete,
-                    account_to_delete,
+                    delete_btn,
                     delete_btn,
                     account_name,
                     full_name,
