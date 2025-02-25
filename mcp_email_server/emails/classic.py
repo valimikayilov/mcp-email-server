@@ -8,37 +8,10 @@ from typing import Any
 
 import aioimaplib
 import aiosmtplib
-from pydantic import BaseModel
 
 from mcp_email_server.config import EmailServer, EmailSettings
-
-
-class EmailData(BaseModel):
-    subject: str
-    sender: str
-    body: str
-    date: datetime
-    attachments: list[str]
-
-    @classmethod
-    def from_email(cls, email: dict[str, Any]):
-        return cls(
-            subject=email["subject"],
-            sender=email["from"],
-            body=email["body"],
-            date=email["date"],
-            attachments=email["attachments"],
-        )
-
-
-class EmailPageResponse(BaseModel):
-    page: int
-    page_size: int
-    before: datetime | None
-    after: datetime | None
-    include: str | None
-    emails: list[EmailData]
-    total: int
+from mcp_email_server.emails import EmailHandler
+from mcp_email_server.emails.models import EmailData, EmailPageResponse
 
 
 class EmailClient:
@@ -128,16 +101,20 @@ class EmailClient:
             await imap.select("INBOX")
 
             # Build search criteria
-            search_criteria = "ALL"
+            search_criteria = []
             if before:
-                search_criteria = f'(BEFORE "{before.isoformat()}")'
+                search_criteria.extend(["BEFORE", before.isoformat()])
             if after:
-                search_criteria = f'{search_criteria} (AFTER "{after.isoformat()}")'
+                search_criteria.extend(["AFTER", after.isoformat()])
             if include:
-                search_criteria = f'{search_criteria} (TEXT "{include}")'
+                search_criteria.extend(["TEXT", include])
+
+            # If no specific criteria, search for ALL
+            if not search_criteria:
+                search_criteria = ["ALL"]
 
             # Search for messages
-            _, messages = await imap.search(search_criteria)
+            _, messages = await imap.search(*search_criteria)
             message_ids = messages[0].split()
             start = (page - 1) * page_size
             end = start + page_size
@@ -203,16 +180,20 @@ class EmailClient:
             await imap.select("INBOX")
 
             # Build search criteria
-            search_criteria = "ALL"
+            search_criteria = []
             if before:
-                search_criteria = f'(BEFORE "{before.isoformat()}")'
+                search_criteria.extend(["BEFORE", before.isoformat()])
             if after:
-                search_criteria = f'{search_criteria} (AFTER "{after.isoformat()}")'
+                search_criteria.extend(["AFTER", after.isoformat()])
             if include:
-                search_criteria = f'{search_criteria} (TEXT "{include}")'
+                search_criteria.extend(["TEXT", include])
+
+            # If no specific criteria, search for ALL
+            if not search_criteria:
+                search_criteria = ["ALL"]
 
             # Search for messages and count them
-            _, messages = await imap.search(search_criteria)
+            _, messages = await imap.search(*search_criteria)
             return len(messages[0].split())
         finally:
             # Ensure we logout properly
@@ -237,7 +218,7 @@ class EmailClient:
             await smtp.send_message(msg)
 
 
-class ClassicEmailHandler:
+class ClassicEmailHandler(EmailHandler):
     def __init__(self, email_settings: EmailSettings):
         self.email_settings = email_settings
         self.incoming_client = EmailClient(email_settings.incoming)
@@ -268,5 +249,5 @@ class ClassicEmailHandler:
             total=total,
         )
 
-    async def send_email(self, recipient: str, subject: str, body: str):
+    async def send_email(self, recipient: str, subject: str, body: str) -> None:
         await self.outgoing_client.send_email(recipient, subject, body)

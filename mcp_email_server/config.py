@@ -86,6 +86,7 @@ class EmailSettings(AccountAttributes):
         imap_ssl: bool = True,
         smtp_port: int = 465,
         smtp_ssl: bool = True,
+        smtp_start_ssl: bool = False,
         smtp_user_name: str | None = None,
         smtp_password: str | None = None,
     ) -> EmailSettings:
@@ -98,14 +99,15 @@ class EmailSettings(AccountAttributes):
                 password=imap_password or password,
                 host=imap_host,
                 port=imap_port,
-                ssl=imap_ssl,
+                use_ssl=imap_ssl,
             ),
             outgoing=EmailServer(
                 user_name=smtp_user_name or user_name,
                 password=smtp_password or password,
                 host=smtp_host,
                 port=smtp_port,
-                ssl=smtp_ssl,
+                use_ssl=smtp_ssl,
+                start_ssl=smtp_start_ssl,
             ),
         )
 

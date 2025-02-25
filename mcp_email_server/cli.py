@@ -23,7 +23,9 @@ def sse(
 
 @app.command()
 def ui():
-    typer.echo("🚧 UI not implemented yet")
+    from mcp_email_server.ui import main as ui_main
+
+    ui_main()
 
 
 @app.command()
