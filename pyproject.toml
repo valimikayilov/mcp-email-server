@@ -17,6 +17,8 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
+    "aioimaplib>=2.0.1",
+    "aiosmtplib>=4.0.0",
     "loguru>=0.7.3",
     "mcp[cli]>=1.3.0",
     "pydantic>=2.10.6",
@@ -111,6 +113,8 @@ ignore = [
     "E501",
     # DoNotAssignLambda
     "E731",
+    # raise-vanilla-args
+    "TRY003",
 ]
 
 [tool.ruff.lint.per-file-ignores]

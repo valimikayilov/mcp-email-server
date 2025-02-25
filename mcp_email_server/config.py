@@ -25,7 +25,8 @@ class EmailServer(BaseModel):
     password: str
     host: str
     port: int
-    ssl: bool = True
+    use_ssl: bool = True  # Usually port 465
+    start_ssl: bool = False  # Usually port 587
 
     def masked(self) -> EmailServer:
         return self.model_copy(update={"password": "********"})
@@ -71,6 +72,7 @@ class EmailSettings(AccountAttributes):
     @classmethod
     def init(
         cls,
+        *,
         account_name: str,
         full_name: str,
         email_address: str,
@@ -82,7 +84,7 @@ class EmailSettings(AccountAttributes):
         imap_password: str | None = None,
         imap_port: int = 993,
         imap_ssl: bool = True,
-        smtp_port: int = 587,
+        smtp_port: int = 465,
         smtp_ssl: bool = True,
         smtp_user_name: str | None = None,
         smtp_password: str | None = None,
@@ -168,11 +170,11 @@ class Settings(BaseSettings):
         account_names = set()
         for email in obj.emails:
             if email.account_name in account_names:
-                raise ValueError(f"Duplicate account name {email.account_name}")  # noqa: TRY003
+                raise ValueError(f"Duplicate account name {email.account_name}")
             account_names.add(email.account_name)
         for provider in obj.providers:
             if provider.account_name in account_names:
-                raise ValueError(f"Duplicate account name {provider.account_name}")  # noqa: TRY003
+                raise ValueError(f"Duplicate account name {provider.account_name}")
             account_names.add(provider.account_name)
 
         return obj
