@@ -30,6 +30,19 @@ Then you can try it in [Claude Desktop](https://claude.ai/download). If you want
 }
 ```
 
+If `docker` is avaliable, you can try use docker image, but you may need to config it in your client using `tools` via `MCP`. The default config path is `~/.config/zerolib/mcp_email_server/config.toml`
+
+```json
+{
+  "mcpServers": {
+    "zerolib-email": {
+      "command": "docker",
+      "args": ["run", "-it", "ghcr.io/ai-zerolab/mcp-email-server:latest"]
+    }
+  }
+}
+```
+
 ## Development
 
 This project is managed using [uv](https://github.com/ai-zerolab/uv).
