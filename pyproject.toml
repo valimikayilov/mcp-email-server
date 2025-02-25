@@ -106,6 +106,8 @@ ignore = [
     "E731",
     # raise-vanilla-args
     "TRY003",
+    # try-consider-else
+    "TRY300",
 ]
 
 [tool.ruff.lint.per-file-ignores]

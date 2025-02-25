@@ -47,13 +47,11 @@ def create_ui():  # noqa: C901
                     f"## Configured Accounts\n{accounts_md}",
                     gr.update(choices=email_accounts, value=None),
                     gr.update(visible=True),
-                    gr.update(visible=True),
                 )
             else:
                 return (
                     "No email accounts configured yet.",
                     gr.update(choices=[], value=None),
-                    gr.update(visible=False),
                     gr.update(visible=False),
                 )
 
@@ -102,7 +100,7 @@ def create_ui():  # noqa: C901
             app.load(
                 fn=update_account_list,
                 inputs=None,
-                outputs=[accounts_display, account_to_delete, delete_btn, delete_btn],
+                outputs=[accounts_display, account_to_delete, delete_btn],
             )
 
         # Form for adding a new email account
@@ -178,30 +176,13 @@ def create_ui():  # noqa: C901
                 try:
                     # Validate required fields
                     if not account_name or not full_name or not email_address or not user_name or not password:
-                        return [
+                        # Get account list update
+                        account_md, account_choices, btn_visible = update_account_list()
+                        return (
                             "Error: Please fill in all required fields.",
-                            *update_account_list(),
-                            account_name,
-                            full_name,
-                            email_address,
-                            user_name,
-                            password,
-                            imap_host,
-                            imap_port,
-                            imap_ssl,
-                            imap_user_name,
-                            imap_password,
-                            smtp_host,
-                            smtp_port,
-                            smtp_ssl,
-                            smtp_user_name,
-                            smtp_password,
-                        ]
-
-                    if not imap_host or not smtp_host:
-                        return [
-                            "Error: IMAP and SMTP hosts are required.",
-                            *update_account_list(),
+                            account_md,
+                            account_choices,
+                            btn_visible,
                             account_name,
                             full_name,
                             email_address,
@@ -218,7 +199,33 @@ def create_ui():  # noqa: C901
                             smtp_start_ssl,
                             smtp_user_name,
                             smtp_password,
-                        ]
+                        )
+
+                    if not imap_host or not smtp_host:
+                        # Get account list update
+                        account_md, account_choices, btn_visible = update_account_list()
+                        return (
+                            "Error: IMAP and SMTP hosts are required.",
+                            account_md,
+                            account_choices,
+                            btn_visible,
+                            account_name,
+                            full_name,
+                            email_address,
+                            user_name,
+                            password,
+                            imap_host,
+                            imap_port,
+                            imap_ssl,
+                            imap_user_name,
+                            imap_password,
+                            smtp_host,
+                            smtp_port,
+                            smtp_ssl,
+                            smtp_start_ssl,
+                            smtp_user_name,
+                            smtp_password,
+                        )
 
                     # Get current settings
                     settings = get_settings()
@@ -226,9 +233,13 @@ def create_ui():  # noqa: C901
                     # Check if account name already exists
                     for email in settings.emails:
                         if email.account_name == account_name:
-                            return [
+                            # Get account list update
+                            account_md, account_choices, btn_visible = update_account_list()
+                            return (
                                 f"Error: Account name '{account_name}' already exists.",
-                                *update_account_list(),
+                                account_md,
+                                account_choices,
+                                btn_visible,
                                 account_name,
                                 full_name,
                                 email_address,
@@ -245,7 +256,7 @@ def create_ui():  # noqa: C901
                                 smtp_start_ssl,
                                 smtp_user_name,
                                 smtp_password,
-                            ]
+                            )
 
                     # Create new email settings
                     email_settings = EmailSettings.init(
@@ -273,30 +284,40 @@ def create_ui():  # noqa: C901
                     # Store settings
                     store_settings(settings)
 
+                    # Get account list update
+                    account_md, account_choices, btn_visible = update_account_list()
+
                     # Return success message, update the UI, and clear form fields
-                    return [
+                    return (
                         f"Success: Email account '{account_name}' has been added.",
-                        *update_account_list(),
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",  # Clear basic info and credentials
-                        "",
-                        993,
-                        True,
-                        "",
-                        "",  # Clear IMAP settings
-                        "",
-                        465,
-                        True,
-                        "",
-                        "",  # Clear SMTP settings
-                    ]
+                        account_md,
+                        account_choices,
+                        btn_visible,
+                        "",  # Clear account_name
+                        "",  # Clear full_name
+                        "",  # Clear email_address
+                        "",  # Clear user_name
+                        "",  # Clear password
+                        "",  # Clear imap_host
+                        993,  # Reset imap_port
+                        True,  # Reset imap_ssl
+                        "",  # Clear imap_user_name
+                        "",  # Clear imap_password
+                        "",  # Clear smtp_host
+                        465,  # Reset smtp_port
+                        True,  # Reset smtp_ssl
+                        False,  # Reset smtp_start_ssl
+                        "",  # Clear smtp_user_name
+                        "",  # Clear smtp_password
+                    )
                 except Exception as e:
-                    return [
+                    # Get account list update
+                    account_md, account_choices, btn_visible = update_account_list()
+                    return (
                         f"Error: {e!s}",
-                        *update_account_list(),
+                        account_md,
+                        account_choices,
+                        btn_visible,
                         account_name,
                         full_name,
                         email_address,
@@ -313,7 +334,7 @@ def create_ui():  # noqa: C901
                         smtp_start_ssl,
                         smtp_user_name,
                         smtp_password,
-                    ]
+                    )
 
             # Connect the save button to the save function
             save_btn.click(
@@ -340,7 +361,6 @@ def create_ui():  # noqa: C901
                     status_message,
                     accounts_display,
                     account_to_delete,
-                    delete_btn,
                     delete_btn,
                     account_name,
                     full_name,
