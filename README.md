@@ -28,6 +28,8 @@ Try `uvx mcp-email-server ui` to config, and use following configuration for mcp
 }
 ```
 
+To upgrade, use `uv tool upgrade mcp-email-server`
+
 This package is available on PyPI, so you can install it using `pip install mcp-email-server`
 
 After that, configure your email server using the ui: `mcp-email-server ui`
