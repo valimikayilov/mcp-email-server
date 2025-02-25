@@ -1,5 +1,6 @@
 import typer
 
+from mcp_email_server.app import mcp
 from mcp_email_server.config import delete_settings
 
 app = typer.Typer()
@@ -7,7 +8,7 @@ app = typer.Typer()
 
 @app.command()
 def stdio():
-    typer.echo("🚧 STDIO not implemented yet")
+    mcp.run(transport="stdio")
 
 
 @app.command()
@@ -15,7 +16,9 @@ def sse(
     host: str = "localhost",
     port: int = 9557,
 ):
-    typer.echo("🚧 SSE not implemented yet")
+    mcp.settings.host = host
+    mcp.settings.port = port
+    mcp.run(transport="sse")
 
 
 @app.command()
@@ -27,3 +30,7 @@ def ui():
 def reset():
     delete_settings()
     typer.echo("✅ Config reset")
+
+
+if __name__ == "__main__":
+    app(["stdio"])

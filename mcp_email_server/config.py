@@ -13,7 +13,7 @@ from pydantic_settings import (
     TomlConfigSettingsSource,
 )
 
-from mcp_email_server.logger import logger
+from mcp_email_server.log import logger
 
 DEFAILT_CONFIG_PATH = "~/.config/zerolib/mcp_email_server/config.toml"
 
@@ -27,9 +27,13 @@ class EmailServer(BaseModel):
     port: int
     ssl: bool = True
 
+    def masked(self) -> EmailServer:
+        return self.model_copy(update={"password": "********"})
+
 
 class AccountAttributes(BaseModel):
     account_name: str
+    description: str = ""
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
     updated_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
 
@@ -53,6 +57,9 @@ class AccountAttributes(BaseModel):
         return self.model_dump(exclude={"created_at", "updated_at"}) == other.model_dump(
             exclude={"created_at", "updated_at"}
         )
+
+    def masked(self) -> AccountAttributes:
+        return self.model_copy()
 
 
 class EmailSettings(AccountAttributes):
@@ -100,17 +107,75 @@ class EmailSettings(AccountAttributes):
             ),
         )
 
+    def masked(self) -> EmailSettings:
+        return self.model_copy(
+            update={
+                "incoming": self.incoming.masked(),
+                "outgoing": self.outgoing.masked(),
+            }
+        )
+
 
 class ProviderSettings(AccountAttributes):
     provider_name: str
     api_key: str
 
+    def masked(self) -> AccountAttributes:
+        return self.model_copy(update={"api_key": "********"})
+
 
 class Settings(BaseSettings):
     emails: list[EmailSettings] = []
     providers: list[ProviderSettings] = []
+    db_location: str = CONFIG_PATH.with_name("db.sqlite3").as_posix()
 
-    model_config = SettingsConfigDict(toml_file=CONFIG_PATH)
+    model_config = SettingsConfigDict(toml_file=CONFIG_PATH, validate_assignment=True, revalidate_instances="always")
+
+    def add_email(self, email: EmailSettings) -> None:
+        """Use re-assigned for validation to work."""
+        self.emails = [email, *self.emails]
+
+    def add_provider(self, provider: ProviderSettings) -> None:
+        """Use re-assigned for validation to work."""
+        self.providers = [provider, *self.providers]
+
+    def delete_email(self, account_name: str) -> None:
+        """Use re-assigned for validation to work."""
+        self.emails = [email for email in self.emails if email.account_name != account_name]
+
+    def delete_provider(self, account_name: str) -> None:
+        """Use re-assigned for validation to work."""
+        self.providers = [provider for provider in self.providers if provider.account_name != account_name]
+
+    def get_account(self, account_name: str, masked: bool = False) -> EmailSettings | ProviderSettings | None:
+        for email in self.emails:
+            if email.account_name == account_name:
+                return email if not masked else email.masked()
+        for provider in self.providers:
+            if provider.account_name == account_name:
+                return provider if not masked else provider.masked()
+        return None
+
+    def get_accounts(self, masked: bool = False) -> list[EmailSettings | ProviderSettings]:
+        accounts = self.emails + self.providers
+        if masked:
+            return [account.masked() for account in accounts]
+        return accounts
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_unique_account_names(cls, obj: Settings) -> Settings:
+        account_names = set()
+        for email in obj.emails:
+            if email.account_name in account_names:
+                raise ValueError(f"Duplicate account name {email.account_name}")  # noqa: TRY003
+            account_names.add(email.account_name)
+        for provider in obj.providers:
+            if provider.account_name in account_names:
+                raise ValueError(f"Duplicate account name {provider.account_name}")  # noqa: TRY003
+            account_names.add(provider.account_name)
+
+        return obj
 
     @classmethod
     def settings_customise_sources(
