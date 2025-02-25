@@ -11,54 +11,32 @@ IMAP and SMTP via MCP Server
 - **Github repository**: <https://github.com/ai-zerolab/mcp-email-server/>
 - **Documentation** <https://ai-zerolab.github.io/mcp-email-server/>
 
-## Getting started with your project
+## Installation
 
-### 1. Create a New Repository
+This package is available on PyPI, so you can install it using `pip install mcp-email-server`
 
-First, create a repository on GitHub with the same name as this project, and then run the following commands:
+After that, configure your email server using the ui: `mcp-email-server ui`
 
-```bash
-git init -b main
-git add .
-git commit -m "init commit"
-git remote add origin git@github.com:ai-zerolab/mcp-email-server.git
-git push -u origin main
+Then you can try it in [Claude Desktop](https://claude.ai/download). If you want to intergrate it with other mcp client, run `$which mcp-email-server` for the path and configure it in your client like:
+
+```json
+{
+  "mcpServers": {
+    "zerolib-email": {
+      "command": "{{ ENTRYPOINT }}",
+      "args": ["stdio"]
+    }
+  }
+}
 ```
 
-### 2. Set Up Your Development Environment
+## Development
 
-Then, install the environment and the pre-commit hooks with
+This project is managed using [uv](https://github.com/ai-zerolab/uv).
 
-```bash
-make install
-```
+Try `make install` to install the virtual environment and install the pre-commit hooks.
 
-This will also generate your `uv.lock` file
-
-### 3. Run the pre-commit hooks
-
-Initially, the CI/CD pipeline might be failing due to formatting issues. To resolve those run:
-
-```bash
-uv run pre-commit run -a
-```
-
-### 4. Commit the changes
-
-Lastly, commit the changes made by the two steps above to your repository.
-
-```bash
-git add .
-git commit -m 'Fix formatting issues'
-git push origin main
-```
-
-You are now ready to start development on your project!
-The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
-
-To finalize the set-up for publishing to PyPI, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/publishing/#set-up-for-pypi).
-For activating the automatic documentation with MkDocs, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/mkdocs/#enabling-the-documentation-on-github).
-To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/codecov/).
+Use `uv run mcp-email-server` for local development.
 
 ## Releasing a new version
 
@@ -68,7 +46,3 @@ To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookie
 - Create a new tag in the form `*.*.*`.
 
 For more details, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/cicd/#how-to-trigger-a-release).
-
----
-
-Repository initiated with [fpgmaas/cookiecutter-uv](https://github.com/fpgmaas/cookiecutter-uv).
