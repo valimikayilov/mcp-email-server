@@ -14,17 +14,9 @@ IMAP and SMTP via MCP Server
 
 ## Installation
 
-### Installing via Smithery
-
-To install Email Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@ai-zerolab/mcp-email-server):
-
-```bash
-npx -y @smithery/cli install @ai-zerolab/mcp-email-server --client claude
-```
-
 ### Manual Installation
 
-We recommend using [uv](https://github.com/ai-zerolab/uv) to manage your environment.
+We recommend using [uv](https://github.com/astral-sh/uv) to manage your environment.
 
 Try `uvx mcp-email-server ui` to config, and use following configuration for mcp client:
 
@@ -69,6 +61,14 @@ If `docker` is avaliable, you can try use docker image, but you may need to conf
     }
   }
 }
+```
+
+### Installing via Smithery
+
+To install Email Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@ai-zerolab/mcp-email-server):
+
+```bash
+npx -y @smithery/cli install @ai-zerolab/mcp-email-server --client claude
 ```
 
 ## Development

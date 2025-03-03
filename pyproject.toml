@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "IMAP and SMTP via MCP Server"
 authors = [{ name = "ai-zerolab", email = "jizhongsheng957@gmail.com" }]
 readme = "README.md"
-keywords = ['python']
+keywords = ["MCP", "IMAP", "SMTP", "email"]
 requires-python = ">=3.10,<4.0"
 classifiers = [
     "Intended Audience :: Developers",
@@ -61,7 +61,7 @@ py-modules = ["mcp_email_server"]
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 120
 fix = true
 
