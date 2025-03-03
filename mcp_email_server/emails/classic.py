@@ -133,7 +133,7 @@ class EmailClient:
                     else:
                         # Fallback to searching through all items
                         for _, item in enumerate(data):
-                            if isinstance(item, (bytes, bytearray)) and len(item) > 100:
+                            if isinstance(item, bytes | bytearray) and len(item) > 100:
                                 # Skip header lines that contain FETCH
                                 if isinstance(item, bytes) and b"FETCH" in item:
                                     continue
