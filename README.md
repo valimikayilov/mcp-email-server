@@ -18,20 +18,18 @@ IMAP and SMTP via MCP Server
 
 We recommend using [uv](https://github.com/astral-sh/uv) to manage your environment.
 
-Try `uvx mcp-email-server ui` to config, and use following configuration for mcp client:
+Try `uvx mcp-email-server@latest ui` to config, and use following configuration for mcp client:
 
 ```json
 {
   "mcpServers": {
     "zerolib-email": {
       "command": "uvx",
-      "args": ["mcp-email-server", "stdio"]
+      "args": ["mcp-email-server@latest", "stdio"]
     }
   }
 }
 ```
-
-To upgrade, use `uv tool upgrade mcp-email-server`
 
 This package is available on PyPI, so you can install it using `pip install mcp-email-server`
 

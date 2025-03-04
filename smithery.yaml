@@ -11,7 +11,7 @@ startCommand:
     |-
     (config) => ({
       command: 'uv',
-      args: ['run', 'mcp-email-server', 'stdio'],
+      args: ['run', 'mcp-email-server@latest', 'stdio'],
       env: {}
     })
   exampleConfig: {}
