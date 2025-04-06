@@ -83,7 +83,7 @@ class EmailClient:
             "attachments": attachments,
         }
 
-    async def get_emails_stream(
+    async def get_emails_stream(  # noqa: C901
         self,
         page: int = 1,
         page_size: int = 10,
@@ -103,6 +103,10 @@ class EmailClient:
 
             # Login and select inbox
             await imap.login(self.email_server.user_name, self.email_server.password)
+            try:
+                await imap.id(name="mcp-email-server", version="1.0.0")
+            except Exception as e:
+                logger.warning(f"IMAP ID command failed: {e!s}")
             await imap.select("INBOX")
 
             search_criteria = self._build_search_criteria(before, since, subject, body, text, from_address, to_address)
