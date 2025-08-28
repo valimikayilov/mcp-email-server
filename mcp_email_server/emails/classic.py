@@ -1,6 +1,7 @@
 import email.utils
 from collections.abc import AsyncGenerator
 from datetime import datetime
+from email.header import Header
 from email.mime.text import MIMEText
 from email.parser import BytesParser
 from email.policy import default
@@ -274,9 +275,21 @@ class EmailClient:
     async def send_email(
         self, recipients: list[str], subject: str, body: str, cc: list[str] | None = None, bcc: list[str] | None = None
     ):
-        msg = MIMEText(body)
-        msg["Subject"] = subject
-        msg["From"] = self.sender
+        # Create message with UTF-8 encoding to support special characters
+        msg = MIMEText(body, "plain", "utf-8")
+
+        # Handle subject with special characters
+        if any(ord(c) > 127 for c in subject):
+            msg["Subject"] = Header(subject, "utf-8")
+        else:
+            msg["Subject"] = subject
+
+        # Handle sender name with special characters
+        if any(ord(c) > 127 for c in self.sender):
+            msg["From"] = Header(self.sender, "utf-8")
+        else:
+            msg["From"] = self.sender
+
         msg["To"] = ", ".join(recipients)
 
         # Add CC header if provided (visible to recipients)
