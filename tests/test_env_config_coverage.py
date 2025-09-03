@@ -1,7 +1,7 @@
 """Focused tests to achieve patch coverage for environment variable configuration."""
 
 import os
-import pytest
+
 from mcp_email_server.config import EmailSettings, Settings
 
 
@@ -10,12 +10,12 @@ def test_from_env_missing_email_and_password(monkeypatch):
     # No environment variables set
     result = EmailSettings.from_env()
     assert result is None
-    
+
     # Only email, no password
     monkeypatch.setenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", "test@example.com")
     result = EmailSettings.from_env()
     assert result is None
-    
+
     # Only password, no email
     monkeypatch.delenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", raising=False)
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "pass")
@@ -27,16 +27,16 @@ def test_from_env_missing_hosts_warning(monkeypatch):
     """Test logger.warning for missing hosts - covers lines 154-156."""
     monkeypatch.setenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", "test@example.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "pass")
-    
+
     # Missing both hosts
     result = EmailSettings.from_env()
     assert result is None
-    
+
     # Missing SMTP host
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.test.com")
     result = EmailSettings.from_env()
     assert result is None
-    
+
     # Missing IMAP host
     monkeypatch.delenv("MCP_EMAIL_SERVER_IMAP_HOST")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.test.com")
@@ -51,7 +51,7 @@ def test_from_env_exception_handling(monkeypatch):
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.test.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.test.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_PORT", "invalid")  # Will cause ValueError
-    
+
     result = EmailSettings.from_env()
     assert result is None
 
@@ -62,7 +62,7 @@ def test_from_env_success_with_all_defaults(monkeypatch):
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "pass")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.example.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.example.com")
-    
+
     result = EmailSettings.from_env()
     assert result is not None
     assert result.account_name == "default"
@@ -93,10 +93,10 @@ def test_from_env_with_all_vars_set(monkeypatch):
         "MCP_EMAIL_SERVER_SMTP_USER_NAME": "smtp_john",
         "MCP_EMAIL_SERVER_SMTP_PASSWORD": "smtp_pass",
     }
-    
+
     for key, value in env_vars.items():
         monkeypatch.setenv(key, value)
-    
+
     result = EmailSettings.from_env()
     assert result is not None
     assert result.account_name == "myaccount"
@@ -120,21 +120,21 @@ def test_from_env_boolean_parsing_variations(monkeypatch):
         "MCP_EMAIL_SERVER_IMAP_HOST": "imap.test.com",
         "MCP_EMAIL_SERVER_SMTP_HOST": "smtp.test.com",
     }
-    
+
     # Test "1" = true
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_SSL", "1")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_SSL", "0")
     for key, value in base_env.items():
         monkeypatch.setenv(key, value)
-    
+
     result = EmailSettings.from_env()
     assert result.incoming.use_ssl is True
     assert result.outgoing.use_ssl is False
-    
+
     # Test "on"/"off"
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_SSL", "on")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_START_SSL", "off")
-    
+
     result = EmailSettings.from_env()
     assert result.incoming.use_ssl is True
     assert result.outgoing.start_ssl is False
@@ -145,12 +145,12 @@ def test_settings_init_no_env(monkeypatch, tmp_path):
     config_file = tmp_path / "empty.toml"
     config_file.write_text("")
     monkeypatch.setenv("MCP_EMAIL_SERVER_CONFIG_PATH", str(config_file))
-    
+
     # Clear any email env vars
     for key in list(os.environ.keys()):
         if key.startswith("MCP_EMAIL_SERVER_") and "CONFIG_PATH" not in key:
             monkeypatch.delenv(key, raising=False)
-    
+
     settings = Settings()
     assert len(settings.emails) == 0
 
@@ -160,13 +160,13 @@ def test_settings_init_add_new_account(monkeypatch, tmp_path):
     config_file = tmp_path / "empty.toml"
     config_file.write_text("")
     monkeypatch.setenv("MCP_EMAIL_SERVER_CONFIG_PATH", str(config_file))
-    
+
     monkeypatch.setenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", "new@example.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "newpass")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.new.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.new.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_ACCOUNT_NAME", "newaccount")
-    
+
     settings = Settings()
     assert len(settings.emails) == 1
     assert settings.emails[0].account_name == "newaccount"
@@ -197,14 +197,14 @@ host = "smtp.old.com"
 port = 465
 use_ssl = true
 """)
-    
+
     monkeypatch.setenv("MCP_EMAIL_SERVER_CONFIG_PATH", str(config_file))
     monkeypatch.setenv("MCP_EMAIL_SERVER_ACCOUNT_NAME", "existing")
     monkeypatch.setenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", "new@example.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "newpass")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.new.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.new.com")
-    
+
     settings = Settings()
     assert len(settings.emails) == 1
     assert settings.emails[0].account_name == "existing"
@@ -278,16 +278,16 @@ host = "smtp.third.com"
 port = 465
 use_ssl = true
 """)
-    
+
     monkeypatch.setenv("MCP_EMAIL_SERVER_CONFIG_PATH", str(config_file))
-    
+
     # Override the third account (forces loop to iterate through all)
     monkeypatch.setenv("MCP_EMAIL_SERVER_ACCOUNT_NAME", "third")
     monkeypatch.setenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS", "env@example.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "envpass")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.env.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.env.com")
-    
+
     settings = Settings()
     # Note: Our implementation replaces all TOML with env, so we only get 1 account
     assert len(settings.emails) == 1
@@ -301,10 +301,10 @@ def test_email_settings_masked(monkeypatch):
     monkeypatch.setenv("MCP_EMAIL_SERVER_PASSWORD", "secret123")
     monkeypatch.setenv("MCP_EMAIL_SERVER_IMAP_HOST", "imap.test.com")
     monkeypatch.setenv("MCP_EMAIL_SERVER_SMTP_HOST", "smtp.test.com")
-    
+
     email = EmailSettings.from_env()
     assert email is not None
-    
+
     masked = email.masked()
     assert masked.incoming.password == "********"
     assert masked.outgoing.password == "********"
