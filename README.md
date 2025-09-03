@@ -63,22 +63,23 @@ You can also configure the email server using environment variables, which is pa
 
 #### Available Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `MCP_EMAIL_SERVER_ACCOUNT_NAME` | Account identifier | `"default"` | No |
-| `MCP_EMAIL_SERVER_FULL_NAME` | Display name | Email prefix | No |
-| `MCP_EMAIL_SERVER_EMAIL_ADDRESS` | Email address | - | Yes |
-| `MCP_EMAIL_SERVER_USER_NAME` | Login username | Same as email | No |
-| `MCP_EMAIL_SERVER_PASSWORD` | Email password | - | Yes |
-| `MCP_EMAIL_SERVER_IMAP_HOST` | IMAP server host | - | Yes |
-| `MCP_EMAIL_SERVER_IMAP_PORT` | IMAP server port | `993` | No |
-| `MCP_EMAIL_SERVER_IMAP_SSL` | Enable IMAP SSL | `true` | No |
-| `MCP_EMAIL_SERVER_SMTP_HOST` | SMTP server host | - | Yes |
-| `MCP_EMAIL_SERVER_SMTP_PORT` | SMTP server port | `465` | No |
-| `MCP_EMAIL_SERVER_SMTP_SSL` | Enable SMTP SSL | `true` | No |
-| `MCP_EMAIL_SERVER_SMTP_START_SSL` | Enable STARTTLS | `false` | No |
+| Variable                          | Description        | Default       | Required |
+| --------------------------------- | ------------------ | ------------- | -------- |
+| `MCP_EMAIL_SERVER_ACCOUNT_NAME`   | Account identifier | `"default"`   | No       |
+| `MCP_EMAIL_SERVER_FULL_NAME`      | Display name       | Email prefix  | No       |
+| `MCP_EMAIL_SERVER_EMAIL_ADDRESS`  | Email address      | -             | Yes      |
+| `MCP_EMAIL_SERVER_USER_NAME`      | Login username     | Same as email | No       |
+| `MCP_EMAIL_SERVER_PASSWORD`       | Email password     | -             | Yes      |
+| `MCP_EMAIL_SERVER_IMAP_HOST`      | IMAP server host   | -             | Yes      |
+| `MCP_EMAIL_SERVER_IMAP_PORT`      | IMAP server port   | `993`         | No       |
+| `MCP_EMAIL_SERVER_IMAP_SSL`       | Enable IMAP SSL    | `true`        | No       |
+| `MCP_EMAIL_SERVER_SMTP_HOST`      | SMTP server host   | -             | Yes      |
+| `MCP_EMAIL_SERVER_SMTP_PORT`      | SMTP server port   | `465`         | No       |
+| `MCP_EMAIL_SERVER_SMTP_SSL`       | Enable SMTP SSL    | `true`        | No       |
+| `MCP_EMAIL_SERVER_SMTP_START_SSL` | Enable STARTTLS    | `false`       | No       |
 
 For separate IMAP/SMTP credentials, you can also use:
+
 - `MCP_EMAIL_SERVER_IMAP_USER_NAME` / `MCP_EMAIL_SERVER_IMAP_PASSWORD`
 - `MCP_EMAIL_SERVER_SMTP_USER_NAME` / `MCP_EMAIL_SERVER_SMTP_PASSWORD`
 

@@ -115,11 +115,11 @@ class EmailSettings(AccountAttributes):
     @classmethod
     def from_env(cls) -> EmailSettings | None:
         """Create EmailSettings from environment variables.
-        
+
         Expected environment variables:
         - MCP_EMAIL_SERVER_ACCOUNT_NAME (default: "default")
         - MCP_EMAIL_SERVER_FULL_NAME
-        - MCP_EMAIL_SERVER_EMAIL_ADDRESS  
+        - MCP_EMAIL_SERVER_EMAIL_ADDRESS
         - MCP_EMAIL_SERVER_USER_NAME
         - MCP_EMAIL_SERVER_PASSWORD
         - MCP_EMAIL_SERVER_IMAP_HOST
@@ -133,28 +133,28 @@ class EmailSettings(AccountAttributes):
         # Check if minimum required environment variables are set
         email_address = os.getenv("MCP_EMAIL_SERVER_EMAIL_ADDRESS")
         password = os.getenv("MCP_EMAIL_SERVER_PASSWORD")
-        
+
         if not email_address or not password:
             return None
-            
+
         # Parse boolean values
         def parse_bool(value: str | None, default: bool = True) -> bool:
             if value is None:
                 return default
             return value.lower() in ("true", "1", "yes", "on")
-        
+
         # Get all environment variables with defaults
         account_name = os.getenv("MCP_EMAIL_SERVER_ACCOUNT_NAME", "default")
         full_name = os.getenv("MCP_EMAIL_SERVER_FULL_NAME", email_address.split("@")[0])
         user_name = os.getenv("MCP_EMAIL_SERVER_USER_NAME", email_address)
         imap_host = os.getenv("MCP_EMAIL_SERVER_IMAP_HOST")
         smtp_host = os.getenv("MCP_EMAIL_SERVER_SMTP_HOST")
-        
+
         # Required fields check
         if not imap_host or not smtp_host:
             logger.warning("Missing required email configuration environment variables (IMAP_HOST or SMTP_HOST)")
             return None
-        
+
         try:
             return cls.init(
                 account_name=account_name,
@@ -201,11 +201,11 @@ class Settings(BaseSettings):
     db_location: str = CONFIG_PATH.with_name("db.sqlite3").as_posix()
 
     model_config = SettingsConfigDict(toml_file=CONFIG_PATH, validate_assignment=True, revalidate_instances="always")
-    
+
     def __init__(self, **data: Any) -> None:
         """Initialize Settings with support for environment variables."""
         super().__init__(**data)
-        
+
         # Check for email configuration from environment variables
         env_email = EmailSettings.from_env()
         if env_email:
@@ -215,7 +215,7 @@ class Settings(BaseSettings):
                 if email.account_name == env_email.account_name:
                     existing_account = i
                     break
-            
+
             if existing_account is not None:
                 # Replace existing account with env configuration
                 self.emails[existing_account] = env_email
